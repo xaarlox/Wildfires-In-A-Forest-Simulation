@@ -16,6 +16,16 @@ class WFSim:
         self.bedrock = bedrock
         self.water = water
         self.temp = self.temperature()
+        self.wind = np.random.choice(['calm', 'S', 'N', 'W', 'E', 'SW', 'SE', 'NW', 'NE'])
+        self.offsets = {'calm': [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)],
+                        'N': [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1)],
+                        'S': [(0, -1), (0, 1), (1, -1), (1, 0), (1, 1)],
+                        'E': [(-1, 0), (-1, 1), (0, 1), (1, 0), (1, 1)],
+                        'W': [(-1, -1), (-1, 0), (0, -1), (1, -1), (1, 0)],
+                        'NE': [(-1, 0), (-1, 1), (0, 1)],
+                        'NW': [(-1, -1), (-1, 0), (0, -1)],
+                        'SE': [(0, 1), (1, 0), (1, 1)],
+                        'SW': [(0, -1), (1, -1), (1, 0)]}
 
         self.landscape = np.random.randint(0, 2, (self.h, self.w))
 
@@ -94,5 +104,5 @@ im = ax.imshow(Sim.landscape, cmap=cmap, norm=norm)
 plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
 
 ani = animation.FuncAnimation(fig, update, frames=80, interval=20)
-ani.save('temperature.gif', fps=1.5, savefig_kwargs={'pad_inches': 0})
+ani.save('wind.gif', fps=1.5, savefig_kwargs={'pad_inches': 0})
 plt.show()
