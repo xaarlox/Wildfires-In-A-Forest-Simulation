@@ -15,6 +15,7 @@ class WFSim:
         self.w = w
         self.bedrock = bedrock
         self.water = water
+        self.temp = self.temperature()
 
         self.landscape = np.random.randint(0, 2, (self.h, self.w))
 
@@ -51,7 +52,16 @@ class WFSim:
                     return True
         return False
 
+    def temperature(self, average_temp=20, amplitude=5, noise_level=2):
+        hours = np.arange(24)
+        temperatures = average_temp + amplitude * np.sin(2 * np.pi * hours / 24 - np.pi / 2)
+        temperatures += np.random.normal(0, noise_level, 24)
+        return temperatures
+
     def step(self, step):
+        if step % 24 == 0 and step > 0:
+            self.temp = self.temperature()
+
         new_landscape = self.landscape.copy()
         for i in range(self.landscape.shape[0]):
             for j in range(self.landscape.shape[1]):
@@ -59,7 +69,8 @@ class WFSim:
                     new_landscape[i, j] = -1
                 if self.p > np.random.rand() and self.landscape[i, j] == 0:
                     new_landscape[i, j] = 1
-                if (self.f > np.random.rand() or self.fire_neighbors_check(i, j)) and self.landscape[i, j] == 1:
+                coef = 2 if self.temp[step % 24] > 25 else 1
+                if (self.f * coef > np.random.rand() or self.fire_neighbors_check(i, j)) and self.landscape[i, j] == 1:
                     new_landscape[i, j] = 2
         self.landscape = new_landscape.copy()
 
@@ -83,5 +94,5 @@ im = ax.imshow(Sim.landscape, cmap=cmap, norm=norm)
 plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
 
 ani = animation.FuncAnimation(fig, update, frames=80, interval=20)
-ani.save('new_states.gif', fps=1.5, savefig_kwargs={'pad_inches': 0})
+ani.save('temperature.gif', fps=1.5, savefig_kwargs={'pad_inches': 0})
 plt.show()
